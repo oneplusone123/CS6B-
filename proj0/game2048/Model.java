@@ -54,6 +54,12 @@ public class Model extends Observable {
 
     /** Return the number of squares on one side of the board.
      *  Used for testing. Should be deprecated and removed. */
+
+
+    /**this methods is different from methods "move", what move i
+    mentioned is "move the number whole in the board **/
+
+
     public int size() {
         return board.size();
     }
@@ -109,7 +115,48 @@ public class Model extends Observable {
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
+        board.setViewingPerspective(side);
+        //I revalue the all the tile;
 
+        for(int C=0;C < board.size();C++){
+            for(int R = board.size() - 1; R >=0 ; R--){
+                Tile t = board.tile(C,R);
+                if (board.tile(C, R) != null) {
+                    for (int R1 = R - 1; R1 >= 0; R1--) {
+                        if (board.tile(C, R1) != null) {
+                            if (board.tile(C, R).value() == board.tile(C, R1).value()) {
+                                Tile t1 = board.tile(C, R1);
+                                board.move(C, R, t1);
+                                changed = true;
+                                score += t.value() * 2;
+                                break;
+                            } else {
+                                break;
+                            }
+                        } else {
+                            continue;
+                        }
+                    }
+                }
+                }
+            }
+
+        for(int col=0;col < board.size() ;col++){
+            for(int row = board.size()-1 ; row>=0;row--){
+                if(board.tile(col,row) == null){
+                    for(int o = row - 1; o>=0; o--) {
+                        if (board.tile(col,o) != null ) {
+                            Tile s = board.tile(col, o);
+                            board.move(col, row, s);
+                            changed = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        board.setViewingPerspective(Side.NORTH);
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
@@ -137,7 +184,13 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        for (int row = b.size() - 1; row >= 0; row -= 1) {
+            for (int col = 0; col < b.size(); col += 1) {
+                if (b.tile(col, row) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -147,6 +200,13 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
+        for (int row = b.size() - 1; row >= 0; row -= 1) {
+            for (int col = 0; col < b.size(); col += 1) {
+                if (b.tile(col,row) != null && b.tile(col, row).value() == MAX_PIECE) {
+                    return true;
+                }
+            }
+        }
         // TODO: Fill in this function.
         return false;
     }
@@ -158,6 +218,58 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        for (int row = 0; row < b.size(); row += 1) {
+            for (int col = 0; col < b.size(); col += 1) {
+                if (b.tile(col, row) != null && b.tile(col, row).value() == MAX_PIECE) {
+                    continue;
+                } else {
+                    if ((row >= 1 && row <= b.size() - 2 && col >= 1 && col <= b.size() - 2) &&
+                            (b.tile(col, row).value() == b.tile(col - 1, row).value() ||
+                                    b.tile(col, row).value() == b.tile(col + 1, row).value() ||
+                                    b.tile(col, row).value() == b.tile(col, row - 1).value() ||
+                                    b.tile(col, row).value() == b.tile(col, row + 1).value())) {
+                        return true;
+                    }
+                    if ((col == 0 || col == b.size() - 1) && (row >= 1 && row <= b.size() - 2) && (
+                            b.tile(col, row).value() == b.tile(col, row - 1).value() ||
+                                    b.tile(col, row).value() == b.tile(col, row + 1).value()
+                    )) {
+                        return true;
+                    }
+                    if ((row == 0 || row == b.size() - 1) && (col >= 1 && col <= b.size() - 2) && (
+                            b.tile(col, row).value() == b.tile(col - 1, row).value() ||
+                                    b.tile(col, row).value() == b.tile(col + 1, row).value()
+                    )) {
+                        return true;
+                    }
+                    if ((row == 0 && col == 0) && (
+                            b.tile(col, row).value() == b.tile(col + 1, row).value() ||
+                                    b.tile(col, row).value() == b.tile(col, row + 1).value())) {
+                        return true;
+                    }
+                    if ((row == 0 && col == b.size() - 1) && (
+                            b.tile(col, row).value() == b.tile(col - 1, row).value() ||
+                                    b.tile(col, row).value() == b.tile(col, row + 1).value())) {
+                        return true;
+                    }
+                    if ((row == b.size() - 1 && col == 0) && (
+                            b.tile(col, row).value() == b.tile(col + 1, row).value() ||
+                                    b.tile(col, row).value() == b.tile(col, row - 1).value())) {
+                        return true;
+                    }
+                    if ((row == b.size() - 1 && col == b.size() - 1) && (
+                            b.tile(col, row).value() == b.tile(col - 1, row).value() ||
+                                    b.tile(col, row).value() == b.tile(col, row - 1).value())) {
+                        return true;
+                    }
+
+
+                }
+            }
+        }
         // TODO: Fill in this function.
         return false;
     }
